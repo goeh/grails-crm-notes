@@ -42,6 +42,17 @@ class CrmNotesGrailsPlugin {
     // Online location of the plugin's browseable source code.
     def scm = [url: "https://github.com/goeh/grails-crm-notes"]
 
+    def features = {
+        crmNotes {
+            description "Add notes to objects"
+            permissions {
+                read "crmNotes:show"
+                update "crmNotes:*"
+                admin "crmNotes:*"
+            }
+        }
+    }
+
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
