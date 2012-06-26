@@ -19,7 +19,9 @@ package grails.plugins.crm.notes
 
 import grails.plugins.crm.core.AuditEntity
 import org.apache.commons.lang.StringUtils
+import grails.plugins.crm.core.TenantEntity
 
+@TenantEntity
 @AuditEntity
 class CrmNote {
 
