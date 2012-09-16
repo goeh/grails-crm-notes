@@ -1,24 +1,25 @@
+import grails.plugins.crm.notes.CrmNote
+
 /*
- * Copyright (c) 2012 Goran Ehrsson.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * under the License.
- */
+* Copyright (c) 2012 Goran Ehrsson.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 class CrmNotesGrailsPlugin {
     // the plugin dependency group
     def groupId = "grails.crm"
     // the plugin version
-    def version = "0.1"
+    def version = "1.0-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
     // the other plugins this plugin depends on
@@ -37,7 +38,7 @@ class CrmNotesGrailsPlugin {
     def license = "APACHE"
 
     // Location of the plugin's issue tracker.
-    def issueManagement = [system: "GITHUB", url: "https://github.com/goeh/grails-crm-notes/issues"]
+    def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-notes/issues"]
 
     // Online location of the plugin's browseable source code.
     def scm = [url: "https://github.com/goeh/grails-crm-notes"]
@@ -46,41 +47,29 @@ class CrmNotesGrailsPlugin {
         crmNotes {
             description "Add notes to objects"
             permissions {
-                read "crmNotes:show"
-                update "crmNotes:*"
+                guest "crmNotes:show"
+                user "crmNotes:*"
                 admin "crmNotes:*"
+            }
+            statistics {tenant ->
+                def total = CrmNote.countByTenantId(tenant)
+                def updated = CrmNote.countByTenantIdAndLastUpdatedGreaterThan(tenant, new Date() -31)
+                def usage
+                if (total > 0) {
+                    def tmp = updated / total
+                    if (tmp < 0.1) {
+                        usage = 'low'
+                    } else if (tmp < 0.3) {
+                        usage = 'medium'
+                    } else {
+                        usage = 'high'
+                    }
+                } else {
+                    usage = 'none'
+                }
+                return [usage: usage, objects: total]
             }
         }
     }
 
-    def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional), this event occurs before
-    }
-
-    def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
-    }
-
-    def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-
-    def doWithApplicationContext = { applicationContext ->
-        // TODO Implement post initialization spring config (optional)
-    }
-
-    def onChange = { event ->
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
-
-    def onConfigChange = { event ->
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
-    }
-
-    def onShutdown = { event ->
-        // TODO Implement code that is executed when the application shuts down (optional)
-    }
 }

@@ -12,23 +12,30 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * under the License.
  */
 
 package grails.plugins.crm.notes
 
 import javax.servlet.http.HttpServletResponse
 import grails.converters.JSON
+import grails.plugins.crm.core.TenantUtils
+import grails.plugins.crm.core.WebUtils
 
 class CrmNotesController {
 
     def crmNotesService
+    def crmSecurityService
 
     def show(Long id) {
         def note = crmNotesService.getNote(id)
         if(note) {
-            def timestamp = formatDate(date:(note.lastUpdated ?: note.dateCreated), type:'date')
-            def title = message(code:'crmNote.show.title', default:'Note by {0} at {1}', args:[note.username, timestamp])
+            if((note.tenantId != TenantUtils.tenant) || !crmSecurityService.isValidTenant(note.tenantId)) {
+                crmSecurityService.alert(request, "accessDenied", "No permission to access tenant ${note.tenantId}")
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                return
+            }
+            def timestamp = formatDate(date:(note.lastUpdated ?: note.dateCreated), type:'date', style:'LONG')
+            def title = message(code:'crmNote.show.title', default:'Note by {0} {1}', args:[note.username, timestamp])
             def result = [id:id, username:note.username, timestamp:(note.lastUpdated ?: note.dateCreated), title:title, text:note.text]
             render result as JSON
         } else {
