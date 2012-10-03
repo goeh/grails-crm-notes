@@ -39,5 +39,6 @@ grails.project.dependency.resolution = {
         }
         runtime ":hibernate:$grailsVersion"
         compile "grails.crm:crm-core:latest.integration"
+        runtime "grails.crm:crm-security:latest.integration"
     }
 }

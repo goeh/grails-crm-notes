@@ -17,6 +17,7 @@
 package grails.plugins.crm.notes
 
 import grails.plugins.crm.core.AuditEntity
+import groovy.time.TimeCategory
 import org.apache.commons.lang.StringUtils
 import grails.plugins.crm.core.TenantEntity
 
@@ -25,6 +26,7 @@ import grails.plugins.crm.core.TenantEntity
 class CrmNote {
 
     def crmCoreService
+    def grailsApplication
 
     String ref
     String username
@@ -32,14 +34,14 @@ class CrmNote {
 
     static constraints = {
         ref(maxSize: 80, blank: false)
-        username(maxSize:80, blank:false)
-        text(maxSize:100000, blank:false)
+        username(maxSize: 80, blank: false)
+        text(maxSize: 100000, blank: false)
     }
 
     static mapping = {
-        sort 'dateCreated' : 'desc'
+        sort 'dateCreated': 'desc'
     }
-    static transients = ['reference']
+    static transients = ['reference', 'dao', 'locked']
 
     transient void setReference(object) {
         ref = crmCoreService.getReferenceIdentifier(object)
@@ -47,6 +49,23 @@ class CrmNote {
 
     transient Object getReference() {
         crmCoreService.getReference(ref)
+    }
+
+    transient boolean isLocked() {
+        def editWindow = grailsApplication.config.crm.notes.editWindow
+        def rval = false
+        if (editWindow) {
+            use(TimeCategory) {
+                if ((new Date() - dateCreated) > editWindow.hours) {
+                    rval = true
+                }
+            }
+        }
+        return rval
+    }
+
+    transient Map<String, Object> getDao() {
+        [tenant: tenantId, id: id, dateCreated: dateCreated, lastUpdated: lastUpdated, ref: ref, username: username, text: text]
     }
 
     String toString() {
