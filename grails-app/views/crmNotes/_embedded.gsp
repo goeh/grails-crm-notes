@@ -2,30 +2,22 @@
 
 <r:script>
     $(document).ready(function() {
-        // Slide down the text panel when user selects a note from the list.
-        $("#${view.id}-container .crm-show").click(function(ev) {
-            ev.stopImmediatePropagation();
-            var noteId = $(this).data('crm-id');
-            $.getJSON("${createLink(controller: 'crmNotes', action: 'show')}", {id: noteId}, function(data) {
-                $("#${view.id}-container .crm-panel").html($('<div/>').text(data.text).html().replace(/\n/g, "<br/>"));
-                $("#${view.id}-container .crm-panel").slideDown('slow');
-            });
-            return false;
-        });
 
+        // Slide down input form when Create button is pressed.
         $("#${view.id}-container .crm-create").click(function(ev) {
             ev.stopImmediatePropagation();
-            var panel = $("#${view.id}-container .crm-panel")
+            var panel = $("#${view.id}-container .crm-panel");
             panel.slideUp('fast');
             panel.load("${createLink(controller: 'crmNotes', action: 'create', params: [ref: reference])}", function(data) {
                 panel.slideDown('normal', function() {
                     $("#${view.id}-container .toggle").children().toggle();
-                    $("textarea", panel).focus();
+                    $(":input:visible:first", panel).focus();
                 });
             });
             return false;
         });
 
+        // Slide up input form when Cancel button is pressed.
         $("#${view.id}-container .crm-close").click(function(ev) {
             var panel = $("#${view.id}-container .crm-panel");
             panel.slideUp('fast', function() {
@@ -44,8 +36,8 @@
                     dataType: 'json',
                     success: function(data) {
                         $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}", function() {
+                            updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
                             $("#${view.id}-container .crm-delete").click(deleteHandler);
-                            updateTabCounter("li.nav-${view.id} a", $("table tbody tr", $(this)).length);
                         });
                     },
                     error: function(data) {
@@ -71,8 +63,8 @@
                     panel.slideUp('fast', function() {
                         $("#${view.id}-container .toggle").children().toggle();
                         $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}&pulse=" + data.id, function() {
+                            updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
                             $("#${view.id}-container .crm-delete").click(deleteHandler);
-                            updateTabCounter("li.nav-${view.id} a", $("table tbody tr", $(this)).length);
                         });
                     });
                 },

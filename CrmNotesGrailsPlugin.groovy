@@ -49,7 +49,7 @@ class CrmNotesGrailsPlugin {
             description "Add notes to objects"
             permissions {
                 guest "crmNotes:show"
-                user "crmNotes:*", "*:addNote,deleteNote"
+                user "crmNotes:*"
                 admin "crmNotes:*"
             }
             statistics {tenant ->

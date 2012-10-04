@@ -20,14 +20,14 @@ class CrmNotesServiceTests extends GroovyTestCase {
     void testCreateWithoutLoggedInUser() {
         def user = crmSecurityService.getUser("test")
         shouldFail(IllegalArgumentException) {
-            crmNotesService.create(user, "Hello World", null, true)
+            crmNotesService.create(user, "Hello World", "Hello Groovy world!", null, true)
         }
     }
 
     void testCreateWithLoggedInUser() {
         crmSecurityService.runAs("test") {
             def user = crmSecurityService.getUser()
-            crmNotesService.create(user, "Hello World", null, true)
+            crmNotesService.create(user, "Hello World", "Hello Groovy world!", null, true)
         }
     }
 
@@ -35,7 +35,7 @@ class CrmNotesServiceTests extends GroovyTestCase {
         crmSecurityService.runAs("test") {
             def instance = new CrmUser(username: "foo", name: "FOO")
             shouldFail(IllegalArgumentException) {
-                crmNotesService.create(instance, "Hello World", null, true)
+                crmNotesService.create(instance, "Hello World", "Hello Groovy world!", null, true)
             }
         }
     }

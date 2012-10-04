@@ -17,7 +17,6 @@
 package grails.plugins.crm.notes
 
 import grails.plugins.crm.core.WebUtils
-import groovy.time.TimeCategory
 import org.apache.commons.lang.StringUtils
 
 import javax.servlet.http.HttpServletResponse
@@ -70,7 +69,7 @@ class CrmNotesController {
         }
     }
 
-    def create(String ref, String text) {
+    def create(String ref, String subject, String text) {
 
         def username = crmSecurityService.currentUser?.username
         if (!username) {
@@ -91,7 +90,7 @@ class CrmNotesController {
                             result.error = message(code: "crmNotes.error.save.transient.message", default: "Domain instance [{0}] must be saved before adding notes", args: [instance])
                         } else if (instance?.hasProperty('tenantId') && (instance.tenantId != TenantUtils.tenant)) {
                             crmSecurityService.alert(request, "forbidden",
-                                    "User [$username] tried to attach notes [${StringUtils.abbreviate(text, 20)}] to [${instance.tenantId}#$ref] from tenant [${TenantUtils.tenant}]")
+                                    "User [$username] tried to attach notes [${StringUtils.abbreviate(subject, 20)}] to [${instance.tenantId}#$ref] from tenant [${TenantUtils.tenant}]")
                             response.sendError(HttpServletResponse.SC_FORBIDDEN)
                             return
                         }
@@ -100,7 +99,7 @@ class CrmNotesController {
                     }
 
                     if (!result.error) {
-                        def note = crmNotesService.create(instance, text, username, true)
+                        def note = crmNotesService.create(instance, subject, text, username, true)
                         if (note.hasErrors()) {
                             result.error = message(code: "crmNotes.error.save.message", default: "The note could not be saved", args: note.errors.allErrors)
                         } else {
@@ -108,6 +107,7 @@ class CrmNotesController {
                         }
                     }
                 } catch (Exception e) {
+                    log.error(e)
                     result.error = e.message ?: e.class.name
                 }
                 WebUtils.shortCache(response)
@@ -116,7 +116,7 @@ class CrmNotesController {
         }
     }
 
-    def edit(Long id, String text) {
+    def edit(Long id, String subject, String text) {
 
         def note = crmNotesService.getNote(id)
         if (!note) {
@@ -139,7 +139,7 @@ class CrmNotesController {
                     if (note.locked) {
                         result.error = message(code: "crmNotes.error.edit.window", default: "Editing is disabled for this note")
                     } else {
-                        note.text = text
+                        bindData(note, [subject: subject, text: text])
                         if (note.save(flush: true)) {
                             result = note.dao
                         } else {
@@ -147,6 +147,7 @@ class CrmNotesController {
                         }
                     }
                 } catch (Exception e) {
+                    log.error(e)
                     result.error = e.message
                 }
                 WebUtils.shortCache(response)
@@ -173,6 +174,7 @@ class CrmNotesController {
         try {
             crmNotesService.deleteNote(note)
         } catch (Exception e) {
+            log.error(e)
             result.error = e.message
         }
         WebUtils.shortCache(response)

@@ -27,11 +27,12 @@ class CrmNotesService {
      * Add a note to a domain instance.
      *
      * @param reference a domain instance to attach notes to
+     * @param subject the note subject
      * @param text the note content
      * @params author (optional) the user who wrote the note
      * @return the created CrmNote instance
      */
-    CrmNote create(Object reference, String text, String author = null, boolean save = false) {
+    CrmNote create(Object reference, String subject, String text, String author = null, boolean save = false) {
 
         if (!crmCoreService.isDomainClass(reference)) {
             throw new IllegalArgumentException("The parameter ${reference.class.name} is not a domain instance")
@@ -39,7 +40,7 @@ class CrmNotesService {
 
         if (!reference.ident()) {
             throw new IllegalArgumentException(
-                    "You must save the domain instance [$reference] before calling addNote")
+                    "You must save the domain instance [$reference] before you can add notes to it")
         }
 
         if (!author) {
@@ -49,7 +50,7 @@ class CrmNotesService {
             }
         }
 
-        def note = new CrmNote(username: author, text: text)
+        def note = new CrmNote(username: author, subject: subject, text: text)
         note.reference = reference
 
         if (save && !note.hasErrors()) {

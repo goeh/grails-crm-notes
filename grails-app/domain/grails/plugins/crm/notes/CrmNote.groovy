@@ -30,12 +30,14 @@ class CrmNote {
 
     String ref
     String username
+    String subject
     String text
 
     static constraints = {
         ref(maxSize: 80, blank: false)
         username(maxSize: 80, blank: false)
-        text(maxSize: 100000, blank: false)
+        subject(maxSize: 100, blank: false)
+        text(maxSize: 100000, nullable:true)
     }
 
     static mapping = {
@@ -65,10 +67,10 @@ class CrmNote {
     }
 
     transient Map<String, Object> getDao() {
-        [tenant: tenantId, id: id, dateCreated: dateCreated, lastUpdated: lastUpdated, ref: ref, username: username, text: text]
+        [tenant: tenantId, id: id, dateCreated: dateCreated, lastUpdated: lastUpdated, ref: ref, username: username, subject: subject, text: text]
     }
 
     String toString() {
-        StringUtils.abbreviate(text, 50)
+        subject.toString()
     }
 }
