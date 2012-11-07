@@ -9,7 +9,7 @@
                     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-crmNotes"
                        href="#crmNote-${note.id}">
                         <small class="pull-right">
-                            <crm:user username="${note.username}">${name}</crm:user>
+                            <crm:user username="${note.username}" nouser="${note.username}">${name}</crm:user>
                             <g:formatDate date="${note.lastUpdated ?: note.dateCreated}" type="date" style="long"/>
                         </small>
                         ${note.subject}

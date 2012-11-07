@@ -12,24 +12,14 @@ grails.project.dependency.resolution = {
         // uncomment to disable ehcache
         // excludes 'ehcache'
     }
-    log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    log "warn"
     repositories {
-        grailsCentral()
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
-        mavenCentral()
-        //mavenLocal()
-        mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
+        grailsHome()
         mavenRepo "http://labs.technipelago.se/repo/crm-releases-local/"
-        //mavenRepo "http://snapshots.repository.codehaus.org"
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
+        grailsCentral()
+        //mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
     }
     dependencies {
-        // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-
-        // runtime 'mysql:mysql-connector-java:5.1.5'
     }
 
     plugins {
@@ -37,7 +27,9 @@ grails.project.dependency.resolution = {
               ":release:2.0.4") {
             export = false
         }
-        runtime ":hibernate:$grailsVersion"
+        test(":hibernate:$grailsVersion") {
+            export = false
+        }
         compile "grails.crm:crm-core:latest.integration"
         runtime "grails.crm:crm-security:latest.integration"
     }
