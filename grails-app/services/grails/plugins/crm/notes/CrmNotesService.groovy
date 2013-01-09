@@ -16,12 +16,28 @@
 
 package grails.plugins.crm.notes
 
+import grails.events.Listener
 import org.apache.commons.lang.StringUtils
 
 class CrmNotesService {
 
     def crmCoreService
     def crmSecurityService
+
+    @Listener(namespace = "crmTenant", topic = "requestDelete")
+    def requestDeleteTenant(event) {
+        def tenant = event.id
+        def count = CrmNote.countByTenantId(tenant)
+        return count ? [namespace: "crmNotes", topic: "deleteTenant"] : null
+    }
+
+    @Listener(namespace = "crmNotes", topic = "deleteTenant")
+    def deleteTenant(event) {
+        def tenant = event.id
+        def result = CrmNote.findAllByTenantId(tenant)
+        result*.delete()
+        log.warn("Deleted ${result.size()} notes in tenant $tenant")
+    }
 
     /**
      * Add a note to a domain instance.
