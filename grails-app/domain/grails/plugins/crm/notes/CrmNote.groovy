@@ -17,16 +17,11 @@
 package grails.plugins.crm.notes
 
 import grails.plugins.crm.core.AuditEntity
-import groovy.time.TimeCategory
-import org.apache.commons.lang.StringUtils
 import grails.plugins.crm.core.TenantEntity
 
 @TenantEntity
 @AuditEntity
-class CrmNote {
-
-    def crmCoreService
-    def grailsApplication
+class CrmNote implements Serializable {
 
     String ref
     String username
@@ -37,34 +32,15 @@ class CrmNote {
         ref(maxSize: 80, blank: false)
         username(maxSize: 80, blank: false)
         subject(maxSize: 100, blank: false)
-        text(maxSize: 100000, nullable:true)
+        text(maxSize: 100000, nullable: true, widget: 'textarea')
     }
 
     static mapping = {
         sort 'dateCreated': 'desc'
-    }
-    static transients = ['reference', 'dao', 'locked']
-
-    transient void setReference(object) {
-        ref = crmCoreService.getReferenceIdentifier(object)
+        ref index: 'crm_note_ref_idx'
     }
 
-    transient Object getReference() {
-        crmCoreService.getReference(ref)
-    }
-
-    transient boolean isLocked() {
-        def editWindow = grailsApplication.config.crm.notes.editWindow
-        def rval = false
-        if (editWindow) {
-            use(TimeCategory) {
-                if ((new Date() - dateCreated) > editWindow.hours) {
-                    rval = true
-                }
-            }
-        }
-        return rval
-    }
+    static transients = ['dao']
 
     transient Map<String, Object> getDao() {
         [tenant: tenantId, id: id, dateCreated: dateCreated, lastUpdated: lastUpdated, ref: ref, username: username, subject: subject, text: text]

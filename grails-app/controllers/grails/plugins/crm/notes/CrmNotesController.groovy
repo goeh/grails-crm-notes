@@ -136,7 +136,7 @@ class CrmNotesController {
             case 'POST':
                 def result = [:]
                 try {
-                    if (note.locked) {
+                    if (crmNotesService.isLocked(note)) {
                         result.error = message(code: "crmNotes.error.edit.window", default: "Editing is disabled for this note")
                     } else {
                         bindData(note, [subject: subject, text: text])

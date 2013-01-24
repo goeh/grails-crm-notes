@@ -17,10 +17,12 @@
 package grails.plugins.crm.notes
 
 import grails.events.Listener
-import org.apache.commons.lang.StringUtils
+import grails.plugins.crm.core.TenantUtils
+import groovy.time.TimeCategory
 
 class CrmNotesService {
 
+    def grailsApplication
     def crmCoreService
     def crmSecurityService
 
@@ -50,11 +52,7 @@ class CrmNotesService {
      */
     CrmNote create(Object reference, String subject, String text, String author = null, boolean save = false) {
 
-        if (!crmCoreService.isDomainClass(reference)) {
-            throw new IllegalArgumentException("The parameter ${reference.class.name} is not a domain instance")
-        }
-
-        if (!reference.ident()) {
+        if (crmCoreService.isDomainClass(reference) && !reference.ident()) {
             throw new IllegalArgumentException(
                     "You must save the domain instance [$reference] before you can add notes to it")
         }
@@ -67,7 +65,7 @@ class CrmNotesService {
         }
 
         def note = new CrmNote(username: author, subject: subject, text: text)
-        note.reference = reference
+        note.ref = crmCoreService.getReferenceIdentifier(reference)
 
         if (save && !note.hasErrors()) {
             note.save()
@@ -100,10 +98,17 @@ class CrmNotesService {
         if (!params.order) params.order = 'desc'
         if (params.cache == null) params.cache = true
 
-        CrmNote.findAllByRef(crmCoreService.getReferenceIdentifier(reference), params)
+        CrmNote.createCriteria().list(params) {
+            eq('tenantId', TenantUtils.tenant)
+            eq('ref', crmCoreService.getReferenceIdentifier(reference))
+        }
     }
 
     boolean deleteNote(CrmNote note) {
+        def tenant = TenantUtils.tenant
+        if (note?.tenantId != tenant) {
+            throw new RuntimeException("Cannot delete CrmNote [${note.id}] because it's not associated with the current tenant [$tenant]")
+        }
         note.delete()
         return true
     }
@@ -123,8 +128,53 @@ class CrmNotesService {
             throw new RuntimeException("You must save the domain instance [$reference] before calling deleteAllNotes")
         }
 
-        def result = CrmNote.findAllByRef(crmCoreService.getReferenceIdentifier(reference))
+        def result = CrmNote.createCriteria().list() {
+            eq('tenantId', TenantUtils.tenant)
+            eq('ref', crmCoreService.getReferenceIdentifier(reference))
+        }
         result*.delete()
         result.size()
+    }
+
+    boolean isLocked(CrmNote note) {
+        def editWindow = grailsApplication.config.crm.notes.editWindow
+        def rval = false
+        if (editWindow) {
+            use(TimeCategory) {
+                if ((new Date() - note.dateCreated) > editWindow.hours) {
+                    rval = true
+                }
+            }
+        }
+        return rval
+    }
+
+    List<CrmNote> findRecentNotes(Map params = [:]) {
+        def username = params.username
+        def types = params.types ?: params.type
+        if (types) {
+            if (!(types instanceof Collection)) {
+                types = types.toString().split(/\s*,\s*/).toList()
+            }
+        }
+        if (!params.max) params.max = 5
+        CrmNote.createCriteria().list(params) {
+            eq('tenantId', TenantUtils.tenant)
+            if (username) {
+                eq('username', username)
+            }
+            if (types) {
+                if(types.size() > 1) {
+                    or {
+                        for (type in types) {
+                            ilike('ref', type + '@%')
+                        }
+                    }
+                } else {
+                    ilike('ref', types[0] + '@%')
+                }
+            }
+            gt('dateCreated', new Date() - (grailsApplication.config.crm.notes.recent.days ?: 45))
+        }
     }
 }

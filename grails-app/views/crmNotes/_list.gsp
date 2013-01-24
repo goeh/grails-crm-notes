@@ -21,11 +21,11 @@
                     <div class="accordion-inner">
                         ${note.text}
                         <crm:hasPermission permission="${controllerName + ':edit'}">
-                            <g:unless test="${note.locked}">
-                                    <a href="javascript:void(0);" class="crm-delete text-error pull-right"
-                                       data-crm-id="${note.id}"><small><g:message code="crmNote.button.delete.label"
-                                                                           default="Delete"/></small></a>
-                            </g:unless>
+                            <crm:noteIsEditable note="${note}">
+                                <a href="javascript:void(0);" class="crm-delete text-error pull-right"
+                                   data-crm-id="${note.id}"><small><g:message code="crmNote.button.delete.label"
+                                                                              default="Delete"/></small></a>
+                            </crm:noteIsEditable>
                         </crm:hasPermission>
                     </div>
                 </div>
