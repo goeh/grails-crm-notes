@@ -1,6 +1,5 @@
 package grails.plugins.crm.notes
 
-import grails.plugins.crm.security.CrmUser
 import org.junit.Before
 
 /**
@@ -32,7 +31,7 @@ class CrmNotesServiceTests extends GroovyTestCase {
 
     void testCreateWithoutSavedInstance() {
         crmSecurityService.runAs("test") {
-            def instance = new CrmUser(username: "foo", name: "FOO")
+            def instance = new TestEntity(name: "FOO")
             shouldFail(IllegalArgumentException) {
                 crmNotesService.create(instance, "Hello World", "Hello Groovy world!", null, true)
             }
@@ -100,5 +99,18 @@ class CrmNotesServiceTests extends GroovyTestCase {
                 assert note.ref.startsWith('crmAgreement') || note.ref.startsWith('crmTask')
             }
         }
+    }
+
+    void testDomainAddNoteMethod() {
+        def note = crmSecurityService.runAs("test") {
+            def instance = new TestEntity(name: "FOO")
+            shouldFail(IllegalArgumentException) {
+                instance.addNote("fail", "It should not be possible to add notes to non-persistent entities")
+            }
+            assert instance.save(flush:true)
+            instance.addNote("success", "This note was added with the 'addNote' method.")
+        }
+        assert !crmNotesService.isLocked(note)
+        assert note.username == "test"
     }
 }

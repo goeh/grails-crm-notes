@@ -58,7 +58,7 @@ class CrmNotesService {
         }
 
         if (!author) {
-            author = crmSecurityService.currentUser?.username
+            author = crmSecurityService?.currentUser?.username
             if (!author) {
                 throw new IllegalArgumentException("Only logged in users can create notes")
             }

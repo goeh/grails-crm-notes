@@ -1,4 +1,5 @@
 import grails.plugins.crm.notes.CrmNote
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 /*
 * Copyright (c) 2012 Goran Ehrsson.
@@ -19,15 +20,16 @@ class CrmNotesGrailsPlugin {
     // the plugin dependency group
     def groupId = "grails.crm"
     // the plugin version
-    def version = "1.0.3"
+    def version = "1.0.5"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
     // the other plugins this plugin depends on
     def dependsOn = [:]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-        "grails-app/views/error.gsp",
-        "src/groovy/grails/plugins/crm/notes/TestSecurityDelegate.groovy"
+            "grails-app/views/error.gsp",
+            "grails-app/domain/grails/plugins/crm/notes/TestEntity.groovy",
+            "src/groovy/grails/plugins/crm/notes/TestSecurityDelegate.groovy"
     ]
 
     def title = "Grails CRM Notes"
@@ -44,6 +46,8 @@ class CrmNotesGrailsPlugin {
     // Online location of the plugin's browseable source code.
     def scm = [url: "https://github.com/goeh/grails-crm-notes"]
 
+    def observe = ["domain"]
+
     def features = {
         crmNotes {
             description "Add notes to objects"
@@ -52,9 +56,10 @@ class CrmNotesGrailsPlugin {
                 user "crmNotes:*"
                 admin "crmNotes:*"
             }
-            statistics {tenant ->
+            hidden true
+            statistics { tenant ->
                 def total = CrmNote.countByTenantId(tenant)
-                def updated = CrmNote.countByTenantIdAndLastUpdatedGreaterThan(tenant, new Date() -31)
+                def updated = CrmNote.countByTenantIdAndLastUpdatedGreaterThan(tenant, new Date() - 31)
                 def usage
                 if (total > 0) {
                     def tmp = updated / total
@@ -73,4 +78,41 @@ class CrmNotesGrailsPlugin {
         }
     }
 
+    def doWithDynamicMethods = { ctx ->
+        def crmNotesService = ctx.getBean("crmNotesService")
+        for (domainClass in application.domainClasses) {
+            if (isNoteable(domainClass)) {
+                addDomainMethods(domainClass.clazz.metaClass, crmNotesService)
+            }
+        }
+    }
+
+    def onChange = { event ->
+        def ctx = event.ctx
+        if (event.source && ctx && event.application) {
+            def service = ctx.getBean('crmNotesService')
+            // enhance domain classes with noteable property
+            if ((event.source instanceof Class) && application.isDomainClass(event.source)) {
+                def domainClass = application.getDomainClass(event.source.name)
+                if (isNoteable(domainClass)) {
+                    addDomainMethods(domainClass.metaClass, service)
+                }
+            }
+        }
+    }
+
+    private void addDomainMethods(MetaClass mc, def crmNotesService) {
+        mc.addNote = { String subject, String text, String author = null ->
+            crmNotesService.create(delegate, subject, text, author, true)
+        }
+    }
+
+    private boolean isNoteable(domainClass) {
+        def val = GrailsClassUtils.getStaticPropertyValue(domainClass.clazz, "noteable")
+        if (val != null) {
+            return val
+        }
+        // If something is taggable, it's also noteable (unless specified different above)
+        GrailsClassUtils.getStaticPropertyValue(domainClass.clazz, "taggable")
+    }
 }
