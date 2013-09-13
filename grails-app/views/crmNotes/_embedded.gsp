@@ -86,7 +86,7 @@
 
         <div class="crm-panel hide"></div>
 
-        <crm:hasPermission permission="${controllerName + ':edit'}">
+        <crm:hasPermission permission="crmNotes:create">
             <div class="form-actions toggle">
             <crm:button type="link" controller="crmNotes" action="create" visual="primary" class="crm-create"
                         icon="icon-plus icon-white"></i>
