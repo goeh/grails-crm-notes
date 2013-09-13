@@ -17,15 +17,10 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 * limitations under the License.
 */
 class CrmNotesGrailsPlugin {
-    // the plugin dependency group
     def groupId = "grails.crm"
-    // the plugin version
-    def version = "1.0.5"
-    // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.0 > *"
-    // the other plugins this plugin depends on
+    def version = "1.2.0"
+    def grailsVersion = "2.2 > *"
     def dependsOn = [:]
-    // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/error.gsp",
             "grails-app/domain/grails/plugins/crm/notes/TestEntity.groovy",
@@ -39,11 +34,7 @@ class CrmNotesGrailsPlugin {
     def description = "Let users add notes to domain instances "
     def documentation = "http://grails.org/plugin/crm-notes"
     def license = "APACHE"
-
-    // Location of the plugin's issue tracker.
     def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-notes/issues"]
-
-    // Online location of the plugin's browseable source code.
     def scm = [url: "https://github.com/goeh/grails-crm-notes"]
 
     def observe = ["domain"]
@@ -53,6 +44,7 @@ class CrmNotesGrailsPlugin {
             description "Add notes to objects"
             permissions {
                 guest "crmNotes:show"
+                partner "crmNotes:*"
                 user "crmNotes:*"
                 admin "crmNotes:*"
             }
