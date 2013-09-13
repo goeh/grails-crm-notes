@@ -20,7 +20,7 @@
                      class="accordion-body collapse ${pulse && (pulse == note.id) ? 'in' : ''}">
                     <div class="accordion-inner">
                         ${note.text}
-                        <crm:hasPermission permission="${controllerName + ':edit'}">
+                        <crm:hasPermission permission="crmNotes:edit">
                             <crm:noteIsEditable note="${note}">
                                 <a href="javascript:void(0);" class="crm-delete text-error pull-right"
                                    data-crm-id="${note.id}"><small><g:message code="crmNote.button.delete.label"
