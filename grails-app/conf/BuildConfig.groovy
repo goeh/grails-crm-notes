@@ -13,21 +13,19 @@ grails.project.dependency.resolution = {
         // excludes 'ehcache'
     }
     log "warn"
+    legacyResolve false
     repositories {
-        grailsHome()
         mavenRepo "http://labs.technipelago.se/repo/crm-releases-local/"
         grailsCentral()
-        //mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
     }
     dependencies {
     }
 
     plugins {
         build(":tomcat:$grailsVersion",
-              ":release:2.2.1") {
-            export = false
-        }
-        test(":hibernate:$grailsVersion") {
+                ":hibernate:$grailsVersion",
+                ":release:2.2.1",
+                ":rest-client-builder:1.0.3") {
             export = false
         }
         compile "grails.crm:crm-core:latest.integration"
