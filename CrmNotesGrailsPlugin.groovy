@@ -27,11 +27,11 @@ class CrmNotesGrailsPlugin {
             "src/groovy/grails/plugins/crm/notes/TestSecurityDelegate.groovy"
     ]
 
-    def title = "Grails CRM Notes"
+    def title = "GR8 CRM Notes"
     def author = "Goran Ehrsson"
     def authorEmail = "goran@technipelago.se"
     def organization = [name: "Technipelago AB", url: "http://www.technipelago.se/"]
-    def description = "Let users add notes to domain instances "
+    def description = "Let users add notes to domain instances in GR8 CRM"
     def documentation = "http://grails.org/plugin/crm-notes"
     def license = "APACHE"
     def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-notes/issues"]
