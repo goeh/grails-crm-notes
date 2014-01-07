@@ -9,6 +9,7 @@ grails.project.dependency.resolution = {
     legacyResolve false
     repositories {
         mavenRepo "http://labs.technipelago.se/repo/crm-releases-local/"
+        mavenRepo "http://labs.technipelago.se/repo/plugin-releases-local/"
         grailsCentral()
     }
     dependencies {
@@ -25,6 +26,7 @@ grails.project.dependency.resolution = {
 
         compile "grails.crm:crm-core:latest.integration"
         runtime "grails.crm:crm-security:latest.integration"
+        runtime ":decorator:1.0"
     }
 }
 

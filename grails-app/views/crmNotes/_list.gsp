@@ -1,5 +1,3 @@
-<%@ page defaultCodec="html" %>
-
 <g:if test="${list}">
     <div class="accordion" id="accordion-crmNotes">
 
@@ -9,17 +7,17 @@
                     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-crmNotes"
                        href="#crmNote-${note.id}">
                         <small class="pull-right">
-                            <crm:user username="${note.username}" nouser="${note.username}">${name}</crm:user>
+                            <crm:user username="${note.username}" nouser="${note.username}">${name?.encodeAsHTML()}</crm:user>
                             <g:formatDate date="${note.lastUpdated ?: note.dateCreated}" type="date" style="long"/>
                         </small>
-                        ${note.subject}
+                        ${note.subject?.encodeAsHTML()}
                     </a>
                 </div>
 
                 <div id="crmNote-${note.id}"
                      class="accordion-body collapse ${pulse && (pulse == note.id) ? 'in' : ''}">
                     <div class="accordion-inner">
-                        ${note.text}
+                        <g:decorate encode="HTML" nlbr="true">${note.text}</g:decorate>
                         <crm:hasPermission permission="crmNotes:edit">
                             <crm:noteIsEditable note="${note}">
                                 <a href="javascript:void(0);" class="crm-delete text-error pull-right"
