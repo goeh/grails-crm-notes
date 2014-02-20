@@ -102,15 +102,24 @@ class CrmNotesServiceTests extends GroovyTestCase {
     }
 
     void testDomainAddNoteMethod() {
+        def instance = new TestEntity(name: "FOO")
         def note = crmSecurityService.runAs("test") {
-            def instance = new TestEntity(name: "FOO")
             shouldFail(IllegalArgumentException) {
                 instance.addNote("fail", "It should not be possible to add notes to non-persistent entities")
             }
-            assert instance.save(flush:true)
-            instance.addNote("success", "This note was added with the 'addNote' method.")
+            assert instance.save(flush: true)
+            assert instance.notes.isEmpty()
+            instance.addNote("B", "This note was added with the 'addNote' method.")
+            Thread.sleep(100)
+            instance.addNote("C", "This note was added with the 'addNote' method.")
+            Thread.sleep(100)
+            instance.addNote("A", "This note was added with the 'addNote' method.")
+            Thread.sleep(100)
+            instance.addNote("D", "This note was added with the 'addNote' method.")
         }
         assert !crmNotesService.isLocked(note)
         assert note.username == "test"
+        assert instance.notes[0].subject == "D" // Last added note comes first when using default sort order.
+        assert instance.getNotes([sort: 'subject', order: 'asc'])[0].subject == "A" // Sort by subject ascending order.
     }
 }

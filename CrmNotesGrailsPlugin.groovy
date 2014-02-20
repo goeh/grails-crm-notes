@@ -1,6 +1,3 @@
-import grails.plugins.crm.notes.CrmNote
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-
 /*
 * Copyright (c) 2012 Goran Ehrsson.
 *
@@ -16,9 +13,13 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+
+import grails.plugins.crm.notes.CrmNote
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+
 class CrmNotesGrailsPlugin {
     def groupId = "grails.crm"
-    def version = "1.2.1"
+    def version = "1.2.2"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def pluginExcludes = [
@@ -97,6 +98,9 @@ class CrmNotesGrailsPlugin {
         mc.addNote = { String subject, String text, String author = null ->
             crmNotesService.create(delegate, subject, text, author, true)
         }
+        mc.getNotes = { params = [:] ->
+            crmNotesService.findNotesByReference(delegate, params)
+        }
     }
 
     private boolean isNoteable(domainClass) {
@@ -105,6 +109,8 @@ class CrmNotesGrailsPlugin {
             return val
         }
         // If something is taggable, it's also noteable (unless specified different above)
+        // TODO What motivated this decision?
+        // TODO Any application out there depending on this odd behaviour?
         GrailsClassUtils.getStaticPropertyValue(domainClass.clazz, "taggable")
     }
 }
