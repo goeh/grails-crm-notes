@@ -36,15 +36,6 @@ Notes are automatically stamped with date/time and user that created the note.
 Common use-cases for notes are logging stuff that happened in relation to a domain instance.
 Application code can also add notes automatically when emails are sent or other important events happened.
 
-=== Whats the difference between notes and tasks?
-
-Some might argue that there is an overlap between notes and tasks. Tasks are provided by the +crm-task+ plugin
-and also contains a subject and message. Tasks are more complex and can certainly be used for logging purposes
-but notes are simple and easy to use. If both +crm-notes+ and +crm-task-ui+ plugins are used in the same application
-users might also be confused over what to use. For example when a user called a contact and talked about something important.
-Should that be logged as a simple note on the contact or as a completed tasks associated with the contact?
-There is no simple answer, it depends on the requirements and something you have to discuss with your users.
-
 === Inject notes in GSPs
 
 The plugin provides a GSP view that can be embedded in tabbed {gr8crm} pages.
@@ -140,6 +131,20 @@ Therefore you can configure an *edit window* that makes it possible to edit the 
 ----
 crm.notes.editWindow = 2 // enables editing during two hours after the note was created.
 ----
+
+[NOTE]
+====
+*What's the difference between notes and tasks?*
+
+Some might argue that there is an overlap between notes and completed tasks. Tasks are provided by the +crm-task+ plugin
+and also contains a subject (task title) and message (task description). Tasks can certainly be used for logging purposes
+but they are more complex than notes. Notes only contain a subject and a message body and are very easy for users to create.
+
+If both +crm-notes+ and +crm-task-ui+ plugins are used in the same application users might also be confused over what to use.
+For example when a user called a contact and talked about something important.
+Should that be logged as a simple note on the contact or as a completed tasks associated with the contact?
+There is no simple answer, it depends on the requirements and something you have to discuss with your users.
+====
 
 == License
 
