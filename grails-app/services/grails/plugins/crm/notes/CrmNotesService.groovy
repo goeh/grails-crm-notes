@@ -74,8 +74,14 @@ class CrmNotesService {
         return note
     }
 
+    /**
+     * Get a note instance based on primary key.
+     *
+     * @param id
+     * @return
+     */
     CrmNote getNote(Long id) {
-        CrmNote.get(id)
+        CrmNote.findByIdAndTenantId(id, TenantUtils.tenant)
     }
 
     /**

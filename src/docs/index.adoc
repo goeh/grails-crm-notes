@@ -1,0 +1,150 @@
+= GR8 CRM - Notes Plugin
+Göran Ehrsson <goran@technipelago.se>
+:toc:
+:numbered:
+:icons: font
+:imagesdir: ./images
+:source-highlighter: prettify
+:homepage: http://gr8crm.github.io
+:gr8crm: GR8 CRM
+:gr8source: https://github.com/goeh/grails-crm-notes
+:license: This plugin is licensed with http://www.apache.org/licenses/LICENSE-2.0.html[Apache License version 2.0]
+
+== Introduction
+
+{gr8crm} is a set of http://www.grails.org/[Grails Web Application Framework]
+plugins that makes it easy to develop web applications with CRM functionality.
+
+You can find more information about {gr8crm} on the main documentation site {homepage}.
+
+=== Customer relationship management
+Customer relationship management (CRM) is a system for managing a company’s interactions with current and future customers.
+It involves using technology to organize, automate and synchronize sales, marketing, customer service, and technical support.
+http://en.wikipedia.org/wiki/Customer_relationship_management[Wikipedia]
+
+The {gr8crm} "Ecosystem" currently contains over 40 Grails plugins. For a complete list of plugins see {homepage}.
+
+Each {gr8crm} plugin defines a http://martinfowler.com/bliki/BoundedContext.html[Bounded Context]
+that focus on one specific domain, for example *contact*, *project* or *document*.
+
+== Notes Plugin
+
+The +crm-notes+ plugin provide storage, services and Groovy Server Pages to support adding text notes to domain instances.
+A *note* is a short message (max 2000 characters) with a subject. A note can be added to any domain instance.
+Notes are automatically stamped with date/time and user that created the note.
+
+Common use-cases for notes are logging stuff that happened in relation to a domain instance.
+Application code can also add notes automatically when emails are sent or other important events happened.
+
+=== Whats the difference between notes and tasks?
+
+Some might argue that there is an overlap between notes and tasks. Tasks are provided by the +crm-task+ plugin
+and also contains a subject and message. Tasks are more complex and can certainly be used for logging purposes
+but notes are simple and easy to use. If both +crm-notes+ and +crm-task-ui+ plugins are used in the same application
+users might also be confused over what to use. For example when a user called a contact and talked about something important.
+Should that be logged as a simple note on the contact or as a completed tasks associated with the contact?
+There is no simple answer, it depends on the requirements and something you have to discuss with your users.
+
+=== Inject notes in GSPs
+
+The plugin provides a GSP view that can be embedded in tabbed {gr8crm} pages.
+To inject the note view in *Contact Details* page from the +crm-contact-ui+ plugin, add the following code to +BootStrap.groovy+.
+
+[source,groovy]
+.BootStrap.groovy
+----
+class BootStrap {
+
+    def crmCoreService
+    def crmPluginService
+    def crmNotesService
+
+    def init = { servletContext ->
+        crmPluginService.registerView('crmContact', 'show', 'tabs',   // <1>
+            [id: "notes",
+                index: 600, // <2>
+                permission: "crmNotes:show", // <3>
+                label: "crmContact.tab.notes.label",
+                template: '/crmNotes/embedded', plugin: "crm-notes",
+                model: {
+                    def id = crmCoreService.getReferenceIdentifier(crmContact)    // <4>
+                    def result = crmNotesService.findNotesByReference(crmContact) // <5>
+                    return [bean: crmContact, list: result, totalCount: result.size(), reference: id]
+                } // <6>
+            ]
+        )
+    }
+}
+----
+<1> Add the tab to crmContact/show.gsp
+<2> Tab order, lower number tabs are inserted to the left of higher number tabs.
+<3> Permission *crmNotes:show* is required to see the note tab
+<4> The reference identifier is used to create a *dynamic relation* between the note and the domain instance.
+<5> Find existing notes attached to the domain instance so the inserted view/tab can list them.
+<6> The +model+ Closure have access to page scope in crmContact/show.gsp and can therefore reference the domain instance *crmContact*.
+
+The note view will display a list of notes attached to a domain instance and includes a button to add notes.
+
+The views uses Twitter Bootstrap for styling and jQuery for interaction.
+
+.Create a new note
+image::note-create.png[Add note, role="thumb"]
+
+.List existing notes
+image::note-list.png[List of notes, role="thumb"]
+
+== CrmNotesService
+
+You can use +CrmNotesService+ to create notes programatically.
+
+=== Create a note
+
++CrmNote create(Object reference, String subject, String text, String author = null, boolean save = false)+
+
+This method creates a new +CrmNote+ instance and attach it to a domain instance +reference+.
+If +author+ is null the current authenticated user will be assigned as the author or the note.
+
+=== Retrieve a note
+
++CrmNote getNote(Long id)+
+
+Get a note based on primary key.
+
+=== List notes
+
++List findNotesByReference(reference, params = [:])+
+
+List all notes attached to a domain instance +reference+. Sorting and pagination parameters can be specified with +params+.
+
+=== Delete a note
+
++boolean deleteNote(CrmNote note)+
+
+Deleted a note instance.
+
++int deleteAllNotes(reference)+
+
+Deletes all notes attached to a domain instance +reference+. Returns the number of notes deleted.
+
+== Configuration
+
+=== Edit window
+
+A note is normally immutable which means that is cannot be edited.
+Because notes are commonly used a log records you don't want users to be able to change the history.
+But if notes are added manually the user could make spelling errors or other typos. It's nice to give the user an opportunity to correct their mistakes.
+Therefore you can configure an *edit window* that makes it possible to edit the note during a short period after it was created.
+
+[source,groovy]
+.Config.groovy
+----
+crm.notes.editWindow = 2 // enables editing during two hours after the note was created.
+----
+
+== License
+
+{license}
+
+== Source Code
+
+The source code for this plugin is available at {gr8source}
