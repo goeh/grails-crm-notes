@@ -12,5 +12,10 @@ With CRM we mean features like:
 
 ## Notes Plugin
 
-This plugin provides functions to add short notes to domain instances.
-A note has a title and a message body.
+This plugin provide storage, services and Groovy Server Pages to support adding text notes to domain instances.
+A note is a short message (max 2000 characters) with a subject. A note can be added to any domain instance.
+Notes are automatically stamped with date/time and user that created the note.
+
+### Documentation
+
+Complete documentation for this plugin can be found at [gr8crm.github.io](http://gr8crm.github.io/plugins/crm-notes/)
