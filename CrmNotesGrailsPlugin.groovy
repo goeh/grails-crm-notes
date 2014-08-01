@@ -22,12 +22,12 @@ class CrmNotesGrailsPlugin {
     def version = "2.0.0"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
+    def loadAfter = ['crmCore']
     def pluginExcludes = [
             "grails-app/views/error.gsp",
             "grails-app/domain/grails/plugins/crm/notes/TestEntity.groovy",
             "src/groovy/grails/plugins/crm/notes/TestSecurityDelegate.groovy"
     ]
-
     def title = "Quick Notes for GR8 CRM"
     def author = "Goran Ehrsson"
     def authorEmail = "goran@technipelago.se"
