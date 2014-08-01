@@ -33,7 +33,7 @@ class CrmNotesGrailsPlugin {
     def authorEmail = "goran@technipelago.se"
     def organization = [name: "Technipelago AB", url: "http://www.technipelago.se/"]
     def description = "Let users add notes to domain instances in GR8 CRM applications"
-    def documentation = "http://gr8crm.github.io/plugins/crm-i18n/"
+    def documentation = "http://gr8crm.github.io/plugins/crm-notes/"
     def license = "APACHE"
     def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-notes/issues"]
     def scm = [url: "https://github.com/goeh/grails-crm-notes"]
