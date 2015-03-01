@@ -146,6 +146,11 @@ Should that be logged as a simple note on the contact or as a completed tasks as
 There is no simple answer, it depends on the requirements and something you have to discuss with your users.
 ====
 
+== Changes
+
+2.4.0:: First version compatible with Grails 2.4.4.
+2.0.0:: First public release.
+
 == License
 
 {license}
@@ -153,3 +158,9 @@ There is no simple answer, it depends on the requirements and something you have
 == Source Code
 
 The source code for this plugin is available at {gr8source}
+
+== Contributing
+
+Please report {gr8source}/issues[issues or suggestions].
+
+Want to improve the plugin: Fork the {gr8source}[repository] and send a pull request.

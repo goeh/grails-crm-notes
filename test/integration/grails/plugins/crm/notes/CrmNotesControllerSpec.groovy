@@ -1,40 +1,50 @@
 package grails.plugins.crm.notes
 
-import org.junit.After
-import org.junit.Before
+import spock.lang.Shared
 
 /**
  * Tests for CrmNotesController
  */
-class CrmNotesControllerTests extends GroovyTestCase {
+class CrmNotesControllerSpec extends grails.test.spock.IntegrationSpec {
+    @Shared
     def controller
+    @Shared
     def crmSecurityService
+    @Shared
     def crmCoreService
+    @Shared
     def crmNotesService
+    @Shared
     def grailsApplication
 
-    @Before
-    void setUp() {
+    def setupSpec() {
         // Setup logic here
         controller = new CrmNotesController()
         controller.crmSecurityService = crmSecurityService
         controller.crmNotesService = crmNotesService
         controller.grailsApplication = grailsApplication
 
-        crmSecurityService.createUser([username: "test", name: "Test User", email: "test@test.com", password: "test123", enabled: true])
+        if(! crmSecurityService.getUserInfo("test")) {
+            crmSecurityService.createUser([username: "test", name: "Test User", email: "test@test.com", password: "test123", enabled: true])
+        }
     }
 
-    void testCreateWithoutLoggedInUser() {
+    def testCreateWithoutLoggedInUser() {
+        given:
         controller.params.ref = "crmUser@1"
         controller.params.subject = "Hello World"
         controller.params.text = "Hello World"
         controller.request.method = "POST"
+
+        when:
         controller.create()
-        assert controller.response.status != null
-        println controller.response.status.toString()
+
+        then:
+        controller.response.status != null
     }
 
-    void testCreateWithLoggedInUser() {
+    def testCreateWithLoggedInUser() {
+        given:
         def user = crmSecurityService.getUser("test")
         controller.params.ref = crmCoreService.getReferenceIdentifier(user)
         controller.params.subject = "Hello World"
@@ -43,17 +53,33 @@ class CrmNotesControllerTests extends GroovyTestCase {
             controller.request.method = "POST"
             controller.create()
         }
+
+        when:
         def json = controller.response.json
-        assert json != null
-        assert json.id != null
-        assert json.error == null
+
+
+        then:
+        json != null
+        json.id != null
+        json.error == null
     }
 
-    void testUpdateNote() {
+    def testUpdateNote() {
+        when:
         def user = crmSecurityService.getUser("test")
-        assert user != null
+
+        then:
+        user != null
+
+
+        when:
         def ref = crmCoreService.getReferenceIdentifier(user)
-        assert ref != null
+
+        then:
+        ref != null
+
+
+        when:
         controller.params.ref = ref
         controller.params.subject = "Hello World"
         controller.params.text = "Hello World"
@@ -62,12 +88,15 @@ class CrmNotesControllerTests extends GroovyTestCase {
             controller.create()
         }
         def json = controller.response.json
-        assert json != null
-        assert json.id != null
-        assert json.error == null
-        assert json.subject == "Hello World"
-        assert json.text == "Hello World"
 
+        then:
+        json != null
+        json.id != null
+        json.error == null
+        json.subject == "Hello World"
+        json.text == "Hello World"
+
+        when:
         controller.response.reset()
 
         controller.params.id = json.id
@@ -78,12 +107,15 @@ class CrmNotesControllerTests extends GroovyTestCase {
             controller.edit()
         }
         json = controller.response.json
-        assert json != null
-        assert json.id != null
-        assert json.error == null
-        assert json.subject == "Hello World"
-        assert json.text == "Hello World!!!"
 
+        then:
+        json != null
+        json.id != null
+        json.error == null
+        json.subject == "Hello World"
+        json.text == "Hello World!!!"
+
+        when:
         def tmp = CrmNote.get(json.id)
         tmp.dateCreated = new Date() - 1
         tmp.save(flush: true)
@@ -98,12 +130,15 @@ class CrmNotesControllerTests extends GroovyTestCase {
             controller.edit()
         }
         json = controller.response.json
-        assert json != null
-        assert json.id != null
-        assert json.error == null
-        assert json.subject == "Hello World"
-        assert json.text == "Hello modified World"
 
+        then:
+        json != null
+        json.id != null
+        json.error == null
+        json.subject == "Hello World"
+        json.text == "Hello modified World"
+
+        when:
         controller.response.reset()
 
         grailsApplication.config.crm.notes.editWindow = 4
@@ -116,9 +151,11 @@ class CrmNotesControllerTests extends GroovyTestCase {
             controller.edit()
         }
         json = controller.response.json
-        assert json != null
-        assert json.id == null
-        assert json.error == "Editing is disabled for this note"
-        assert json.text == null
+
+        then:
+        json != null
+        json.id == null
+        json.error == "Editing is disabled for this note"
+        json.text == null
     }
 }
