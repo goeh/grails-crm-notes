@@ -17,14 +17,15 @@
                 <div id="crmNote-${note.id}"
                      class="accordion-body collapse ${pulse && (pulse == note.id) ? 'in' : ''}">
                     <div class="accordion-inner">
-                        <g:decorate encode="HTML" nlbr="true">${note.text}</g:decorate>
                         <crm:hasPermission permission="crmNotes:edit">
                             <crm:noteIsEditable note="${note}">
                                 <a href="javascript:void(0);" class="crm-delete text-error pull-right"
-                                   data-crm-id="${note.id}"><small><g:message code="crmNote.button.delete.label"
-                                                                              default="Delete"/></small></a>
+                                   data-crm-id="${note.id}"><i class="icon-trash"></i></a>
+                                <a href="javascript:void(0);" class="crm-edit pull-right" style="margin-right: 9px;"
+                                   data-crm-id="${note.id}"><i class="icon-pencil"></i></a>
                             </crm:noteIsEditable>
                         </crm:hasPermission>
+                        <g:decorate encode="HTML" nlbr="true">${note.text}</g:decorate>
                     </div>
                 </div>
             </div>

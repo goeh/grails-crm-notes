@@ -1,6 +1,63 @@
 <%@ page defaultCodec="html" %>
 
 <r:script>
+    var CRM = {
+        editHandler: function(ev) {
+            var id = $(this).data('crm-id');
+            $('#edit-notes-modal').load("${createLink(controller: 'crmNotes', action: 'edit')}/" + id, function(data) {
+                var $modal = $(this).find('.modal');
+                var $form = $modal.find('form');
+                $form.submit(function(ev) {
+                    ev.preventDefault();
+                    $.ajax({
+                        type: 'POST',
+                        url: "${createLink(controller: 'crmNotes', action: 'edit')}",
+                        data: $form.serialize(),
+                        dataType: 'json',
+                        success: function(data) {
+                            $modal.modal('hide');
+                            $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}", function() {
+                                updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
+                                $("#${view.id}-container .crm-edit").click(CRM.editHandler);
+                                $("#${view.id}-container .crm-delete").click(CRM.deleteHandler);
+                            });
+                        },
+                        error: function(data) {
+                            alert("Failed to update note");
+                        }
+                    });
+                });
+                $modal.on('shown', function () {
+                    $('input[name="subject"]', $modal).focus();
+                })
+                $modal.modal('show');
+            });
+        },
+        deleteHandler: function(ev) {
+            var msg = $("<div/>").html("${message(code: 'crmNote.button.delete.confirm.message', default: 'Are you sure you want to delete the note?')}").text();
+            if(confirm(msg)) {
+                var id = $(this).data('crm-id');
+                $.ajax({
+                    type: 'POST',
+                    url: "${createLink(controller: 'crmNotes', action: 'delete')}",
+                    data: {id: id},
+                    dataType: 'json',
+                    success: function(data) {
+                        $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}", function() {
+                            updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
+                            $("#${view.id}-container .crm-edit").click(CRM.editHandler);
+                            $("#${view.id}-container .crm-delete").click(CRM.deleteHandler);
+                        });
+                    },
+                    error: function(data) {
+                        alert("ERROR: " + data);
+                    }
+                });
+            }
+            return false;
+        }
+    };
+
     $(document).ready(function() {
 
         // Slide down input form when Create button is pressed.
@@ -25,30 +82,10 @@
             });
         });
 
-        var deleteHandler = function(ev) {
-            var msg = $("<div/>").html("${message(code: 'crmNote.button.delete.confirm.message', default: 'Are you sure you want to delete the note?')}").text();
-            if(confirm(msg)) {
-                var id = $(this).data('crm-id');
-                $.ajax({
-                    type: 'POST',
-                    url: "${createLink(controller: 'crmNotes', action: 'delete')}",
-                    data: {id: id},
-                    dataType: 'json',
-                    success: function(data) {
-                        $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}", function() {
-                            updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
-                            $("#${view.id}-container .crm-delete").click(deleteHandler);
-                        });
-                    },
-                    error: function(data) {
-                        alert("ERROR: " + data);
-                    }
-                });
-            }
-            return false;
-        };
 
-        $("#${view.id}-container .crm-delete").click(deleteHandler);
+
+        $("#${view.id}-container .crm-edit").click(CRM.editHandler);
+        $("#${view.id}-container .crm-delete").click(CRM.deleteHandler);
 
         $("#${view.id}-container form").submit(function(ev) {
             ev.preventDefault();
@@ -64,7 +101,8 @@
                         $("#${view.id}-container .toggle").children().toggle();
                         $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}&pulse=" + data.id, function() {
                             updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
-                            $("#${view.id}-container .crm-delete").click(deleteHandler);
+                            $("#${view.id}-container .crm-edit").click(CRM.editHandler);
+                            $("#${view.id}-container .crm-delete").click(CRM.deleteHandler);
                         });
                     });
                 },
@@ -104,3 +142,5 @@
         </crm:hasPermission>
     </g:form>
 </div>
+
+<div id="edit-notes-modal"></div>
