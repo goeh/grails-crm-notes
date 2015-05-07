@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Goran Ehrsson.
+ * Copyright (c) 2015 Goran Ehrsson.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ class CrmNotesController {
         }
         switch (request.method) {
             case 'GET':
-                render template: '/crmNotes/form', plugin: 'crm-notes', model: [bean: note]
+                render template: '/crmNotes/edit', plugin: 'crm-notes', model: [bean: note]
                 break
             case 'POST':
                 def result = [:]

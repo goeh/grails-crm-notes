@@ -23,7 +23,7 @@ grails.project.dependency.resolution = {
         test(":code-coverage:1.2.7") { export = false }
 
         compile ":crm-core:2.0.2"
-        compile ":crm-security:2.0.0"
+        compile ":crm-security:2.0.2"
         compile ":decorator:1.1"
     }
 }
