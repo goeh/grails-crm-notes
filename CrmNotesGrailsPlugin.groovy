@@ -19,7 +19,7 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 class CrmNotesGrailsPlugin {
     def groupId = ""
-    def version = "2.0.1"
+    def version = "2.0.2"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmCore']
