@@ -1,7 +1,7 @@
 <%@ page defaultCodec="html" %>
 
 <r:script>
-    var CRM = {
+    var CrmNotes = {
         editHandler: function(ev) {
             var id = $(this).data('crm-id');
             $('#edit-notes-modal').load("${createLink(controller: 'crmNotes', action: 'edit')}/" + id, function(data) {
@@ -18,8 +18,8 @@
                             $modal.modal('hide');
                             $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}", function() {
                                 updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
-                                $("#${view.id}-container .crm-edit").click(CRM.editHandler);
-                                $("#${view.id}-container .crm-delete").click(CRM.deleteHandler);
+                                $("#${view.id}-container .crm-edit").click(CrmNotes.editHandler);
+                                $("#${view.id}-container .crm-delete").click(CrmNotes.deleteHandler);
                             });
                         },
                         error: function(data) {
@@ -45,8 +45,8 @@
                     success: function(data) {
                         $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}", function() {
                             updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
-                            $("#${view.id}-container .crm-edit").click(CRM.editHandler);
-                            $("#${view.id}-container .crm-delete").click(CRM.deleteHandler);
+                            $("#${view.id}-container .crm-edit").click(CrmNotes.editHandler);
+                            $("#${view.id}-container .crm-delete").click(CrmNotes.deleteHandler);
                         });
                     },
                     error: function(data) {
@@ -84,8 +84,8 @@
 
 
 
-        $("#${view.id}-container .crm-edit").click(CRM.editHandler);
-        $("#${view.id}-container .crm-delete").click(CRM.deleteHandler);
+        $("#${view.id}-container .crm-edit").click(CrmNotes.editHandler);
+        $("#${view.id}-container .crm-delete").click(CrmNotes.deleteHandler);
 
         $("#${view.id}-container form").submit(function(ev) {
             ev.preventDefault();
@@ -101,8 +101,8 @@
                         $("#${view.id}-container .toggle").children().toggle();
                         $("#${view.id}-container .crm-list").load("${createLink(controller: 'crmNotes', action: 'list', params: [ref: reference])}&pulse=" + data.id, function() {
                             updateTabCounter("li.nav-${view.id} a", $(".accordion .accordion-group", $(this)).length);
-                            $("#${view.id}-container .crm-edit").click(CRM.editHandler);
-                            $("#${view.id}-container .crm-delete").click(CRM.deleteHandler);
+                            $("#${view.id}-container .crm-edit").click(CrmNotes.editHandler);
+                            $("#${view.id}-container .crm-delete").click(CrmNotes.deleteHandler);
                         });
                     });
                 },
