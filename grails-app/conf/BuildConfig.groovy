@@ -27,8 +27,8 @@ grails.project.dependency.resolution = {
         test("org.hibernate:hibernate-validator:5.0.3.Final") { export = false }
     }
     plugins {
-        build(":release:3.0.1",
-                ":rest-client-builder:1.0.3") {
+        build(":release:3.1.2",
+                ":rest-client-builder:2.1.1") {
             export = false
         }
         test(":hibernate4:4.3.6.1") {
@@ -36,11 +36,11 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        test(":codenarc:0.24.1") { export = false }
+        test(":codenarc:0.25.2") { export = false }
         test(":code-coverage:2.0.3-3") { export = false }
 
-        compile ":crm-core:2.4.2"
-        compile ":crm-security:2.4.2"
+        compile ":crm-core:2.4.3"
+        compile ":crm-security:2.4.3"
         compile ":decorator:1.1"
     }
 }
